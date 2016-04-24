@@ -81,12 +81,17 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
     private GoPluginApiResponse handleGetConfigRequest()
     {
         return DefaultGoPluginApiResponse.success("{" +
-                                                          "  \"resultXmlFileLocation\": {" +
-                                                          "    \"default-value\": \"target/scalastyle-result.xml\"," +
-                                                          "    \"secure\": false," +
-                                                          "    \"required\": true" +
-                                                          "  }" +
-                                                          "}");
+                                                      "  \"resultXmlFileLocation\": {" +
+                                                      "    \"default-value\": \"target/scalastyle-result.xml\"," +
+                                                      "    \"secure\": false," +
+                                                      "    \"required\": true" +
+                                                      "  }," +
+                                                      "  \"artifactXmlFileLocation\": {" +
+                                                      "    \"default-value\": \"\"," +
+                                                      "    \"secure\": false," +
+                                                      "    \"required\": true" +
+                                                      "  }" +
+                                                      "}");
     }
 
     private GoPluginApiResponse handleTaskView()
@@ -123,14 +128,30 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
             final Gson GSON = new GsonBuilder().create();
             final Map dataMap = GSON.fromJson(request.requestBody(), Map.class);
 
-            Map configData = (Map) dataMap.get("config");
-            Map contextData = (Map) dataMap.get("context");
-            Map envVarsData = (Map) contextData.get("environmentVariables");
-            Map resultsFileData = (Map) configData.get("resultXmlFileLocation");
-            String workingDirectory = (String) contextData.get("workingDirectory");
-            String resultXmlFileLocation = (String) resultsFileData.get("value");
-            String fullResultsXmlFileLocation = workingDirectory + "/" + resultXmlFileLocation;
+            final Map configData = (Map) dataMap.get("config");
+            final Map contextData = (Map) dataMap.get("context");
+            final Map envVarsData = (Map) contextData.get("environmentVariables");
 
+            final Map resultsFileData = (Map) configData.get("resultXmlFileLocation");
+            final String workingDirectory = (String) contextData.get("workingDirectory");
+            final String resultXmlFileLocation = (String) resultsFileData.get("value");
+            final String fullResultsXmlFileLocation = workingDirectory + "/" + resultXmlFileLocation;
+
+            final Map resultsArtifactData = (Map) configData.get("artifactXmlFileLocation");
+            final String resultArtifactFileLocation = (String) resultsArtifactData.get("value");
+            final String fullResultsArtifactLocation = resultArtifactFileLocation + "/" + getResultsFileName(resultXmlFileLocation);
+
+            final String pipelineName = (String) envVarsData.get("GO_PIPELINE_NAME");
+            final String pipelineLabel = (String) envVarsData.get("GO_PIPELINE_LABEL");
+            final String stageName = (String) envVarsData.get("GO_STAGE_NAME");
+            final String stageCounter = (String) envVarsData.get("GO_STAGE_COUNTER");
+            final String jobName = (String) envVarsData.get("GO_JOB_NAME");
+
+            final String serverBaseURLToUse = System.getProperty("go.plugin.github.pr.comment.go-server", "http://localhost:8153");
+
+            //http://localhost:8153/go/files/scala-playground/27/defaultStage/2/compile/analysis/scalastyle-result.xml
+            final String trackbackLink = String.format("%s/go/files/%s/%s/%s/%s/%s/%s",
+                                                       serverBaseURLToUse, pipelineName, pipelineLabel, stageName, stageCounter, jobName, fullResultsArtifactLocation);
 
             if (taskWasTriggeredFromPullRequest(envVarsData))
             {
@@ -138,11 +159,11 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
 
                 if (Files.exists(resultsFilePath))
                 {
-                    final String summary = scalastyleResultsAnalyser.buildGithubMarkdownSummary(resultsFilePath);
+                    final String summary = scalastyleResultsAnalyser.buildGithubMarkdownSummary(resultsFilePath, trackbackLink);
 
 
-                    String url = (String) envVarsData.get(getKeyLike(envVarsData, "^GO_SCM.*PRS_URL$"));
-                    int pullRequestId = Integer.parseInt((String) envVarsData.get(getKeyLike(envVarsData, "^GO_SCM.*PRS_PR_ID$")));
+                    final String url = (String) envVarsData.get(getKeyLike(envVarsData, "^GO_SCM.*PRS_URL$"));
+                    final int pullRequestId = Integer.parseInt((String) envVarsData.get(getKeyLike(envVarsData, "^GO_SCM.*PRS_PR_ID$")));
 
                     pullRequestCommenter.addCommentToPullRequest(url, pullRequestId, summary);
 
@@ -167,6 +188,12 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
             logger().printLine("[Error]: Error -> " + e.toString());
             return renderJSON(HttpStatus.SC_INTERNAL_SERVER_ERROR, ImmutableMap.of("success", false, "message", e.toString()));
         }
+    }
+
+    private String getResultsFileName(final String resultsXmlFileLocation)
+    {
+        final String[] tokens = resultsXmlFileLocation.split("/");
+        return tokens[tokens.length - 1];
     }
 
     private boolean taskWasTriggeredFromPullRequest(final Map<String, Object> taskEnvironmentVariables)

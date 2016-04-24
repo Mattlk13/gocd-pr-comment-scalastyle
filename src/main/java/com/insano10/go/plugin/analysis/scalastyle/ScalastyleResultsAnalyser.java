@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ScalastyleResultsAnalyser
 {
-    public String buildGithubMarkdownSummary(final Path resultsFilePath)
+    public String buildGithubMarkdownSummary(final Path resultsFilePath, String trackbackLink)
     {
         final List<String> lines = getLinesFromFile(resultsFilePath);
 
@@ -23,13 +23,13 @@ public class ScalastyleResultsAnalyser
             info += line.contains("severity=\"info\"") ? 1 : 0;
         }
 
-        return String.format("## :mag:  Scalastyle Analysis Summary\n" +
+        return String.format("## :mag:  Scalastyle Summary  [(details)](%s)\n" +
                               "\n" +
                               "| Severity |  Issues found |\n" +
                               "| -------- | ------------- |\n" +
                               "| :exclamation:  **Errors**  | %d  |\n" +
                               "| :warning:  **Warnings**  | %d |\n" +
-                              "| :information_source:  **Info**  | %d |", errors, warnings, info);
+                              "| :information_source:  **Info**  | %d |", trackbackLink, errors, warnings, info);
     }
 
     private List<String> getLinesFromFile(final Path filePath)

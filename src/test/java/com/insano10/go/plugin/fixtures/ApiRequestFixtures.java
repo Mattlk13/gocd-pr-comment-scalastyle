@@ -5,7 +5,7 @@ import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
 
 public class ApiRequestFixtures
 {
-    public static DefaultGoPluginApiRequest executeTaskFromPRRequest(String repositoryUrl, int pullRequestId, final String workingDirectory, final String resultXmlFileLocation)
+    public static DefaultGoPluginApiRequest executeTaskFromPRRequest(String repositoryUrl, int pullRequestId, final String workingDirectory, final String resultXmlFileLocation, String artifactXmlFileLocation)
     {
         final String requestBody = "{" +
                 "  \"context\": {" +
@@ -35,6 +35,11 @@ public class ApiRequestFixtures
                 "      \"secure\": false," +
                 "      \"value\": \"" + resultXmlFileLocation + "\"," +
                 "      \"required\": false" +
+                "    }," +
+                "    \"artifactXmlFileLocation\": {" +
+                "      \"secure\": false," +
+                "      \"value\": \"" + artifactXmlFileLocation + "\"," +
+                "      \"required\": false" +
                 "    }" +
                 "  }" +
                 "}";
@@ -42,7 +47,7 @@ public class ApiRequestFixtures
         return createRequest(requestBody);
     }
 
-    public static DefaultGoPluginApiRequest executeTaskFromMasterRequest(final String workingDirectory, final String resultXmlFileLocation)
+    public static DefaultGoPluginApiRequest executeTaskFromMasterRequest(final String workingDirectory, final String resultXmlFileLocation, String artifactXmlFileLocation)
     {
         final String requestBody = "{" +
                 "  \"context\": {" +
@@ -65,6 +70,11 @@ public class ApiRequestFixtures
                 "    \"resultXmlFileLocation\": {" +
                 "      \"secure\": false," +
                 "      \"value\": \"" + resultXmlFileLocation +"\"," +
+                "      \"required\": false" +
+                "    }," +
+                "    \"artifactXmlFileLocation\": {" +
+                "      \"secure\": false," +
+                "      \"value\": \"" + artifactXmlFileLocation + "\"," +
                 "      \"required\": false" +
                 "    }" +
                 "  }" +
