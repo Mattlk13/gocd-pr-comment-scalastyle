@@ -20,6 +20,12 @@ public class ScalastyleResultsAnalyserTest
     {
         final String summary = analyser.buildGithubMarkdownSummary(RESULTS_FILE_PATH);
 
-        assertThat(summary, is("0 errors\n265 warnings\n0 info"));
+        assertThat(summary, is("## :mag:  Scalastyle Analysis Summary\n" +
+                                       "\n" +
+                                       "| Severity |  Issues found |\n" +
+                                       "| -------- | ------------- |\n" +
+                                       "| :exclamation:  **Errors**  | 0  |\n" +
+                                       "| :warning:  **Warnings**  | 265 |\n" +
+                                       "| :information_source:  **Info**  | 0 |"));
     }
 }

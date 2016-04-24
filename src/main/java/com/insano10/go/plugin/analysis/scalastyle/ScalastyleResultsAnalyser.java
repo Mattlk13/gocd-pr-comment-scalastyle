@@ -1,7 +1,5 @@
 package com.insano10.go.plugin.analysis.scalastyle;
 
-import com.thoughtworks.go.plugin.api.logging.Logger;
-
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -10,8 +8,6 @@ import java.util.List;
 
 public class ScalastyleResultsAnalyser
 {
-    private static final Logger LOGGER = Logger.getLoggerFor(ScalastyleResultsAnalyser.class);
-
     public String buildGithubMarkdownSummary(final Path resultsFilePath)
     {
         final List<String> lines = getLinesFromFile(resultsFilePath);
@@ -27,7 +23,13 @@ public class ScalastyleResultsAnalyser
             info += line.contains("severity=\"info\"") ? 1 : 0;
         }
 
-        return String.format("%d errors\n%d warnings\n%d info", errors, warnings, info);
+        return String.format("## :mag:  Scalastyle Analysis Summary\n" +
+                              "\n" +
+                              "| Severity |  Issues found |\n" +
+                              "| -------- | ------------- |\n" +
+                              "| :exclamation:  **Errors**  | %d  |\n" +
+                              "| :warning:  **Warnings**  | %d |\n" +
+                              "| :information_source:  **Info**  | %d |", errors, warnings, info);
     }
 
     private List<String> getLinesFromFile(final Path filePath)
