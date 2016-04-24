@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<go-plugin id="github.pr.comment.scalastyle" version="1">
+    <about>
+        <name>Github Pull Request Comment: Scalastyle</name>
+        <version>0.1</version>
+        <target-go-version>15.1.0</target-go-version>
+        <description>Comments on Github pull requests with Scalastyle results</description>
+        <vendor>
+            <name>Jennifer Beckett</name>
+            <url>https://github.com/insano10/gocd-pr-comment-scalastyle</url>
+        </vendor>
+    </about>
+</go-plugin>
