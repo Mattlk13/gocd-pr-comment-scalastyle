@@ -5,236 +5,49 @@ import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
 
 public class ApiRequestFixtures
 {
-    public static DefaultGoPluginApiRequest stageStatusRequestMasterBuilding(final String repositoryUrl)
+    public static DefaultGoPluginApiRequest executeTaskRequest(String repositoryUrl, int pullRequestId, final String resultXmlFileLocation)
     {
         final String requestBody = "{" +
-                "  \"pipeline\": {" +
-                "    \"name\": \"my-test-repo\"," +
-                "    \"counter\": \"1\"," +
-                "    \"group\": \"pull-requests\"," +
-                "    \"build-cause\": [" +
-                "      {" +
-                "        \"material\": {" +
-                "          \"plugin-id\": \"github.pr\"," +
-                "          \"scm-configuration\": {" +
-                "            \"url\": \"" + repositoryUrl + "\"" +
-                "          }," +
-                "          \"type\": \"scm\"" +
-                "        }," +
-                "        \"changed\": true," +
-                "        \"modifications\": [" +
-                "          {" +
-                "            \"revision\": \"ee8c8de6619ad353c8ed922027e58ebeb1c66cc5\"," +
-                "            \"modified-time\": \"2016-03-13T15:48:23.000Z\"," +
-                "            \"data\": {" +
-                "              \"PR_ID\": \"master\"" +
-                "            }" +
-                "          }" +
-                "        ]" +
-                "      }" +
-                "    ]," +
-                "    \"stage\": {" +
-                "      \"name\": \"defaultStage\"," +
-                "      \"counter\": \"1\"," +
-                "      \"approval-type\": \"success\"," +
-                "      \"approved-by\": \"changes\"," +
-                "      \"state\": \"Building\"," +
-                "      \"result\": \"Unknown\"," +
-                "      \"create-time\": \"2016-04-22T14:40:39.799Z\"," +
-                "      \"last-transition-time\": \"\"," +
-                "      \"jobs \": [" +
-                "        {" +
-                "          \"name\": \"compile\"," +
-                "          \"schedule-time\": \"2016-04-22T14:40:39.799Z\"," +
-                "          \"complete-time\": \"\"," +
-                "          \"state\": \"Scheduled\"," +
-                "          \"result\": \"Unknown\"" +
-                "        }" +
-                "      ]" +
+                "  \"context\": {" +
+                "    \"workingDirectory\": \"pipelines/my-test-pipeline\"," +
+                "    \"environmentVariables\": {" +
+                "      \"GO_SCM_MY_TEST_PIPELINE_PRS_PR_BRANCH\": \"testUser:myBranch\"," +
+                "      \"GO_SERVER_URL\": \"https://127.0.0.1:8154/go/\"," +
+                "      \"GO_SCM_MY_TEST_PIPELINE_PRS_TARGET_BRANCH\": \"testUser:master\"," +
+                "      \"GO_PIPELINE_LABEL\": \"19\"," +
+                "      \"GO_STAGE_NAME\": \"defaultStage\"," +
+                "      \"GO_PIPELINE_NAME\": \"my-test-pipeline\"," +
+                "      \"GO_SCM_MY_TEST_PIPELINE_PRS_URL\": \"" + repositoryUrl + "\"," +
+                "      \"GO_SCM_MY_TEST_PIPELINE_PRS_LABEL\": \"822b7a86dce336d06e429801e384ea4221c29672\"," +
+                "      \"GO_SCM_MY_TEST_PIPELINE_PRS_PR_TITLE\": \"random change\"," +
+                "      \"GO_SCM_MY_TEST_PIPELINE_PRS_PR_AUTHOR\": \"Jenny Beckett\"," +
+                "      \"GO_STAGE_COUNTER\": \"1\"," +
+                "      \"GO_PIPELINE_COUNTER\": \"19\"," +
+                "      \"GO_JOB_NAME\": \"myJob\"," +
+                "      \"GO_SCM_MY_TEST_PIPELINE_PRS_PR_URL\": \"https://github.com/testUser/my-test-repo/pull/" + pullRequestId + "\"," +
+                "      \"GO_TRIGGER_USER\": \"anonymous\"," +
+                "      \"GO_SCM_MY_TEST_PIPELINE_PRS_PR_DESCRIPTION\": \"testing testing\"," +
+                "      \"GO_SCM_MY_TEST_PIPELINE_PRS_PR_ID\": \"" + pullRequestId + "\"" +
+                "    }" +
+                "  }," +
+                "  \"config\": {" +
+                "    \"resultXmlFileLocation\": {" +
+                "      \"secure\": false," +
+                "      \"value\": \"" + resultXmlFileLocation + "\"," +
+                "      \"required\": false" +
                 "    }" +
                 "  }" +
                 "}";
 
-        return createRequest(requestBody);
-    }
-
-    public static DefaultGoPluginApiRequest stageStatusRequestMasterPassed(final String repositoryUrl)
-    {
-        final String requestBody = "{" +
-                "  \"pipeline\": {" +
-                "    \"name\": \"my-test-repo\"," +
-                "    \"counter\": \"1\"," +
-                "    \"group\": \"pull-requests\"," +
-                "    \"build-cause\": [" +
-                "      {" +
-                "        \"material\": {" +
-                "          \"plugin-id\": \"github.pr\"," +
-                "          \"scm-configuration\": {" +
-                "            \"url\": \"" + repositoryUrl + "\"" +
-                "          }," +
-                "          \"type\": \"scm\"" +
-                "        }," +
-                "        \"changed\": true," +
-                "        \"modifications\": [" +
-                "          {" +
-                "            \"revision\": \"ee8c8de6619ad353c8ed922027e58ebeb1c66cc5\"," +
-                "            \"modified-time\": \"2016-03-13T15:48:23.000Z\"," +
-                "            \"data\": {" +
-                "              \"PR_ID\": \"master\"" +
-                "            }" +
-                "          }" +
-                "        ]" +
-                "      }" +
-                "    ]," +
-                "    \"stage\": {" +
-                "      \"name\": \"defaultStage\"," +
-                "      \"counter\": \"1\"," +
-                "      \"approval-type\": \"success\"," +
-                "      \"approved-by\": \"changes\"," +
-                "      \"state\": \"Passed\"," +
-                "      \"result\": \"Passed\"," +
-                "      \"create-time\": \"2016-04-22T14:40:39.799Z\"," +
-                "      \"last-transition-time\": \"2016-04-22T14:44:52.054Z\"," +
-                "      \"jobs\": [" +
-                "        {" +
-                "          \"name\": \"compile\"," +
-                "          \"schedule-time\": \"2016-04-22T14:40:39.799Z\"," +
-                "          \"complete-time\": \"2016-04-22T14:44:52.054Z\"," +
-                "          \"state\": \"Completed\"," +
-                "          \"result\": \"Passed\"," +
-                "          \"agent-uuid\": \"306af67b-420e-4b8b-8b7b-0eef119670e0\"" +
-                "        }" +
-                "      ]" +
-                "    }" +
-                "  }" +
-                "}";
-        return createRequest(requestBody);
-    }
-
-    public static DefaultGoPluginApiRequest stageStatusRequestPullRequestBuilding(final String repositoryUrl, final int pullRequestId)
-    {
-        final String requestBody = "{" +
-                "  \"pipeline\": {" +
-                "    \"name\": \"my-test-repo\"," +
-                "    \"counter\": \"9\"," +
-                "    \"group\": \"pull-requests\"," +
-                "    \"build-cause\": [" +
-                "      {" +
-                "        \"material\": {" +
-                "          \"plugin-id\": \"github.pr\"," +
-                "          \"scm-configuration\": {" +
-                "            \"url\": \"" + repositoryUrl + "\"" +
-                "          }," +
-                "          \"type\": \"scm\"" +
-                "        }," +
-                "        \"changed\": true," +
-                "        \"modifications\": [" +
-                "          {" +
-                "            \"revision\": \"6e0590979ab748122bdb9df7a0d7a3cb30507ba6\"," +
-                "            \"modified-time\": \"2016-04-22T16:31:55.000Z\"," +
-                "            \"data\": {" +
-                "              \"PR_TITLE\": \"random change\"," +
-                "              \"PR_URL\": \"https://github.com/testUser/my-test-repo/pull/" + pullRequestId + "\"," +
-                "              \"PR_DESCRIPTION\": \"testing testing\"," +
-                "              \"PR_ID\": \"" + pullRequestId + "\"," +
-                "              \"PR_BRANCH\": \"testUser:myBranch\"," +
-                "              \"PR_AUTHOR\": \"Someone\"," +
-                "              \"TARGET_BRANCH\": \"testUser:master\"" +
-                "            }" +
-                "          }" +
-                "        ]" +
-                "      }" +
-                "    ]," +
-                "    \"stage\": {" +
-                "      \"name\": \"defaultStage\"," +
-                "      \"counter\": \"1\"," +
-                "      \"approval-type\": \"success\"," +
-                "      \"approved-by\": \"anonymous\"," +
-                "      \"state\": \"Building\"," +
-                "      \"result\": \"Unknown\"," +
-                "      \"create-time\": \"2016-04-22T16:34:54.294Z\"," +
-                "      \"last-transition-time\": \"\"," +
-                "      \"jobs\": [" +
-                "        {" +
-                "          \"name\": \"compile\"," +
-                "          \"schedule-time\": \"2016-04-22T16:34:54.294Z\"," +
-                "          \"complete-time\": \"\"," +
-                "          \"state\": \"Scheduled\"," +
-                "          \"result\": \"Unknown\"" +
-                "        }" +
-                "      ]" +
-                "    }" +
-                "  }" +
-                "}";
-
-        return createRequest(requestBody);
-    }
-
-    public static DefaultGoPluginApiRequest stageStatusRequestPullRequestPassed(final String repositoryUrl, final int pullRequestId)
-    {
-        final String requestBody = "{" +
-                "  \"pipeline\": {" +
-                "    \"name\": \"my-test-repo\"," +
-                "    \"counter\": \"9\"," +
-                "    \"group\": \"pull-requests\"," +
-                "    \"build-cause\": [" +
-                "      {" +
-                "        \"material\": {" +
-                "          \"plugin-id\": \"github.pr\"," +
-                "          \"scm-configuration\": {" +
-                "            \"url\": \"" + repositoryUrl + "\"" +
-                "          }," +
-                "          \"type\": \"scm\"" +
-                "        }," +
-                "        \"changed\": true," +
-                "        \"modifications\": [" +
-                "          {" +
-                "            \"revision\": \"6e0590979ab748122bdb9df7a0d7a3cb30507ba6\"," +
-                "            \"modified-time\": \"2016-04-22T16:31:55.000Z\"," +
-                "            \"data\": {" +
-                "              \"PR_TITLE\": \"random change\"," +
-                "              \"PR_URL\": \"https://github.com/testUser/my-test-repo/pull/" + pullRequestId + "\"," +
-                "              \"PR_DESCRIPTION\": \"testing testing\"," +
-                "              \"PR_ID\": \"" + pullRequestId + "\"," +
-                "              \"PR_BRANCH\": \"testUser:myBranch\"," +
-                "              \"PR_AUTHOR\": \"Someone\"," +
-                "              \"TARGET_BRANCH\": \"testUser:master\"" +
-                "            }" +
-                "          }" +
-                "        ]" +
-                "      }" +
-                "    ]," +
-                "    \"stage\": {" +
-                "      \"name\": \"defaultStage\"," +
-                "      \"counter\": \"1\"," +
-                "      \"approval-type\": \"success\"," +
-                "      \"approved-by\": \"anonymous\"," +
-                "      \"state\": \"Passed\"," +
-                "      \"result\": \"Passed\"," +
-                "      \"create-time\": \"2016-04-22T16:34:54.294Z\"," +
-                "      \"last-transition-time\": \"2016-04-22T16:35:38.608Z\"," +
-                "      \"jobs\": [" +
-                "        {" +
-                "          \"name\": \"compile\"," +
-                "          \"schedule-time\": \"2016-04-22T16:34:54.294Z\"," +
-                "          \"complete-time\": \"2016-04-22T16:35:38.608Z\"," +
-                "          \"state\": \"Completed\"," +
-                "          \"result\": \"Passed\"," +
-                "          \"agent-uuid\": \"306af67b-420e-4b8b-8b7b-0eef119670e0\"" +
-                "        }" +
-                "      ]" +
-                "    }" +
-                "  }" +
-                "}";
         return createRequest(requestBody);
     }
 
     private static DefaultGoPluginApiRequest createRequest(String requestBody)
     {
         final DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest(
-                PluginConstants.NOTIFICATION_PLUGIN_EXTENSION,
-                PluginConstants.NOTIFICATION_PLUGIN_EXTENSION_VERSION,
-                PluginConstants.REQUEST_NAME_STAGE_STATUS);
+                PluginConstants.TASK_PLUGIN_EXTENSION,
+                PluginConstants.TASK_PLUGIN_EXTENSION_VERSION,
+                PluginConstants.REQUEST_NAME_EXECUTE);
         request.setRequestBody(requestBody);
         return request;
     }

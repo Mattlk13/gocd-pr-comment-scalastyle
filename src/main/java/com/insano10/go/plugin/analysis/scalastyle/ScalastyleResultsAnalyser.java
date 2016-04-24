@@ -12,20 +12,7 @@ public class ScalastyleResultsAnalyser
 {
     private static final Logger LOGGER = Logger.getLoggerFor(ScalastyleResultsAnalyser.class);
 
-    private final Path resultsFilePath;
-
-    public ScalastyleResultsAnalyser(final Path resultsFilePath)
-    {
-        this.resultsFilePath = resultsFilePath;
-    }
-
-    public boolean hasResults()
-    {
-        LOGGER.info("Looking for results file at " + resultsFilePath.toAbsolutePath());
-        return Files.exists(resultsFilePath);
-    }
-
-    public String buildGithubMarkdownSummary()
+    public String buildGithubMarkdownSummary(final Path resultsFilePath)
     {
         final List<String> lines = getLinesFromFile(resultsFilePath);
 
@@ -43,11 +30,11 @@ public class ScalastyleResultsAnalyser
         return String.format("%d errors\n%d warnings\n%d info", errors, warnings, info);
     }
 
-    private List<String> getLinesFromFile(Path resultsFilePath)
+    private List<String> getLinesFromFile(final Path filePath)
     {
         try
         {
-            return Files.readAllLines(resultsFilePath, Charset.forName("UTF-8"));
+            return Files.readAllLines(filePath, Charset.forName("UTF-8"));
         }
         catch (IOException e)
         {
