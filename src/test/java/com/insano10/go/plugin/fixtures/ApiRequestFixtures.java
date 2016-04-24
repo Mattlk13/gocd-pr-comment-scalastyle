@@ -5,11 +5,11 @@ import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
 
 public class ApiRequestFixtures
 {
-    public static DefaultGoPluginApiRequest executeTaskRequest(String repositoryUrl, int pullRequestId, final String resultXmlFileLocation)
+    public static DefaultGoPluginApiRequest executeTaskRequest(String repositoryUrl, int pullRequestId, final String workingDirectory, final String resultXmlFileLocation)
     {
         final String requestBody = "{" +
                 "  \"context\": {" +
-                "    \"workingDirectory\": \"pipelines/my-test-pipeline\"," +
+                "    \"workingDirectory\": \"" + workingDirectory + "\"," +
                 "    \"environmentVariables\": {" +
                 "      \"GO_SCM_MY_TEST_PIPELINE_PRS_PR_BRANCH\": \"testUser:myBranch\"," +
                 "      \"GO_SERVER_URL\": \"https://127.0.0.1:8154/go/\"," +

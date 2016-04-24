@@ -30,15 +30,14 @@ import static java.util.Collections.singletonList;
 @Extension
 public class GithubPRCommentScalastylePlugin implements GoPlugin
 {
-    private final JobConsoleLogger consoleLogger;
     private final GitHubPullRequestCommenter pullRequestCommenter;
     private final ScalastyleResultsAnalyser scalastyleResultsAnalyser;
+    private JobConsoleLogger consoleLogger;
 
     public GithubPRCommentScalastylePlugin()
     {
         this.pullRequestCommenter = new GitHubPullRequestCommenter(PluginSettingsProvider.getPluginSettings());
         this.scalastyleResultsAnalyser = new ScalastyleResultsAnalyser();
-        this.consoleLogger = JobConsoleLogger.getConsoleLogger();
     }
 
     public GithubPRCommentScalastylePlugin(final GitHubPullRequestCommenter pullRequestCommenter,
@@ -54,7 +53,7 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
     public void initializeGoApplicationAccessor(GoApplicationAccessor goApplicationAccessor)
     {
     }
-
+    
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) throws UnhandledRequestTypeException
     {
@@ -104,7 +103,7 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
             responseCode = DefaultGoApiResponse.INTERNAL_ERROR;
             String errorMessage = "Failed to find template: " + e.getMessage();
             view.put("exception", errorMessage);
-            consoleLogger.printLine("[Error]: " + errorMessage + " -> " + e.toString());
+            logger().printLine("[Error]: " + errorMessage + " -> " + e.toString());
         }
         return renderJSON(responseCode, view);
     }
@@ -116,8 +115,8 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
 
     private GoPluginApiResponse executeTask(final GoPluginApiRequest request)
     {
-        consoleLogger.printLine("Task executing...");
-        consoleLogger.printLine("Request parameters: " + request.requestBody());
+        logger().printLine("Task executing...");
+        logger().printLine("Request parameters: " + request.requestBody());
 
         try
         {
@@ -125,16 +124,19 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
             final Map dataMap = GSON.fromJson(request.requestBody(), Map.class);
 
             Map configData = (Map) dataMap.get("config");
+            Map contextData = (Map) dataMap.get("context");
             Map resultsFileData = (Map) configData.get("resultXmlFileLocation");
+            String workingDirectory = (String) contextData.get("workingDirectory");
             String resultXmlFileLocation = (String) resultsFileData.get("value");
+            String fullResultsXmlFileLocation = workingDirectory + "/" + resultXmlFileLocation;
 
-            final Path resultsFilePath = Paths.get(resultXmlFileLocation);
+            final Path resultsFilePath = Paths.get(fullResultsXmlFileLocation);
 
             if (Files.exists(resultsFilePath))
             {
                 final String summary = scalastyleResultsAnalyser.buildGithubMarkdownSummary(resultsFilePath);
 
-                Map contextData = (Map) dataMap.get("context");
+
                 Map envVarsData = (Map) contextData.get("environmentVariables");
 
                 String url = (String) envVarsData.get(getKeyLike(envVarsData, "^GO_SCM.*PRS_URL$"));
@@ -142,20 +144,20 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
 
                 pullRequestCommenter.addCommentToPullRequest(url, pullRequestId, summary);
 
-                consoleLogger.printLine("Summary successfully added to " + url + ", PR ID [" + pullRequestId + "]");
+                logger().printLine("Summary successfully added to " + url + ", PR ID [" + pullRequestId + "]");
             }
             else
             {
-                consoleLogger.printLine("No Scalastyle results found at " + resultsFilePath.toAbsolutePath());
+                logger().printLine("No Scalastyle results found at " + resultsFilePath.toAbsolutePath());
             }
 
-            consoleLogger.printLine("Task execution complete.");
-            return DefaultGoPluginApiResponse.success("{\"success\": true, \"message\": \"Task execution complete\"}");
+            logger().printLine("Task execution complete.");
+            return renderJSON(HttpStatus.SC_OK, ImmutableMap.of("success", true, "message", "Task execution complete"));
         }
         catch (Exception e)
         {
-            consoleLogger.printLine("[Error]: Error -> " + e.toString());
-            return renderJSON(HttpStatus.SC_INTERNAL_SERVER_ERROR, ImmutableMap.of("status", "failure", "messages", singletonList(e.toString())));
+            logger().printLine("[Error]: Error -> " + e.toString());
+            return renderJSON(HttpStatus.SC_INTERNAL_SERVER_ERROR, ImmutableMap.of("success", false, "message", e.toString()));
         }
     }
 
@@ -178,5 +180,15 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
 
         apiResponse.setResponseBody(responseBody);
         return apiResponse;
+    }
+
+    private JobConsoleLogger logger()
+    {
+        //horrible hack to lazily load the logger after a context magically appears from somewhere
+        if(this.consoleLogger == null)
+        {
+            this.consoleLogger = JobConsoleLogger.getConsoleLogger();
+        }
+        return this.consoleLogger;
     }
 }
