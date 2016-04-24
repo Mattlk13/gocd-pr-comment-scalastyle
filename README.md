@@ -30,6 +30,3 @@ Usage:
 
 When the pipeline completes successfully, the plugin will examine the scalastyle results XML file and comment on the pull request with a summary of the findings
 
-## Issues
-
-what happens if you add this task on a non PR material pipeline?

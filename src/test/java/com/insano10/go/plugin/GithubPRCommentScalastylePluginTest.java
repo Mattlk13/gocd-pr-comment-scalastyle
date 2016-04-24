@@ -10,7 +10,8 @@ import org.junit.Test;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.insano10.go.plugin.fixtures.ApiRequestFixtures.executeTaskRequest;
+import static com.insano10.go.plugin.fixtures.ApiRequestFixtures.executeTaskFromMasterRequest;
+import static com.insano10.go.plugin.fixtures.ApiRequestFixtures.executeTaskFromPRRequest;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -32,9 +33,18 @@ public class GithubPRCommentScalastylePluginTest
 
 
     @Test
+    public void shouldNotCommentIfTaskWasNotTriggeredFromAPullRequest() throws Exception
+    {
+        final GoPluginApiResponse response = plugin.handle(executeTaskFromMasterRequest(WORKING_DIRECTORY, RESULTS_FILE_LOCATION));
+
+        verify(pullRequestCommenter, never()).addCommentToPullRequest(any(String.class), anyInt(), any(String.class));
+        assertEquals("{\"success\":true,\"message\":\"Task execution complete\"}", response.responseBody());
+    }
+
+    @Test
     public void shouldNotCommentIfScalastyleResultsAreNotFound() throws Exception
     {
-        final GoPluginApiResponse response = plugin.handle(executeTaskRequest(REPOSITORY_URL, PULL_REQUEST_ID, WORKING_DIRECTORY, UNKNOWN_RESULTS_FILE_LOCATION));
+        final GoPluginApiResponse response = plugin.handle(executeTaskFromPRRequest(REPOSITORY_URL, PULL_REQUEST_ID, WORKING_DIRECTORY, UNKNOWN_RESULTS_FILE_LOCATION));
 
         verify(pullRequestCommenter, never()).addCommentToPullRequest(any(String.class), anyInt(), any(String.class));
         assertEquals("{\"success\":true,\"message\":\"Task execution complete\"}", response.responseBody());
@@ -47,7 +57,7 @@ public class GithubPRCommentScalastylePluginTest
 
         when(scalastyleResultsAnalyser.buildGithubMarkdownSummary(RESULTS_FILE_PATH)).thenReturn(expectedComment);
 
-        final GoPluginApiResponse response = plugin.handle(executeTaskRequest(REPOSITORY_URL, PULL_REQUEST_ID, WORKING_DIRECTORY, RESULTS_FILE_LOCATION));
+        final GoPluginApiResponse response = plugin.handle(executeTaskFromPRRequest(REPOSITORY_URL, PULL_REQUEST_ID, WORKING_DIRECTORY, RESULTS_FILE_LOCATION));
 
         verify(pullRequestCommenter).addCommentToPullRequest(eq(REPOSITORY_URL), eq(PULL_REQUEST_ID), eq(expectedComment));
         assertEquals("{\"success\":true,\"message\":\"Task execution complete\"}", response.responseBody());
@@ -56,7 +66,7 @@ public class GithubPRCommentScalastylePluginTest
     @Test
     public void shouldReturnFailureMessageIfSomethingUnexpectedGoesWrong() throws Exception
     {
-        final DefaultGoPluginApiRequest request = executeTaskRequest(REPOSITORY_URL, PULL_REQUEST_ID, WORKING_DIRECTORY, RESULTS_FILE_LOCATION);
+        final DefaultGoPluginApiRequest request = executeTaskFromPRRequest(REPOSITORY_URL, PULL_REQUEST_ID, WORKING_DIRECTORY, RESULTS_FILE_LOCATION);
         final String requestBodyWithAnInvalidPullRequestId = request.requestBody().replace("\"GO_SCM_MY_TEST_PIPELINE_PRS_PR_ID\": \"" + PULL_REQUEST_ID + "\"",
                                                                                            "\"GO_SCM_MY_TEST_PIPELINE_PRS_PR_ID\": \"NotAnInteger\"");
         request.setRequestBody(requestBodyWithAnInvalidPullRequestId);

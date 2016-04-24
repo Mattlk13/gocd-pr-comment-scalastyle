@@ -5,7 +5,7 @@ import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
 
 public class ApiRequestFixtures
 {
-    public static DefaultGoPluginApiRequest executeTaskRequest(String repositoryUrl, int pullRequestId, final String workingDirectory, final String resultXmlFileLocation)
+    public static DefaultGoPluginApiRequest executeTaskFromPRRequest(String repositoryUrl, int pullRequestId, final String workingDirectory, final String resultXmlFileLocation)
     {
         final String requestBody = "{" +
                 "  \"context\": {" +
@@ -34,6 +34,37 @@ public class ApiRequestFixtures
                 "    \"resultXmlFileLocation\": {" +
                 "      \"secure\": false," +
                 "      \"value\": \"" + resultXmlFileLocation + "\"," +
+                "      \"required\": false" +
+                "    }" +
+                "  }" +
+                "}";
+
+        return createRequest(requestBody);
+    }
+
+    public static DefaultGoPluginApiRequest executeTaskFromMasterRequest(final String workingDirectory, final String resultXmlFileLocation)
+    {
+        final String requestBody = "{" +
+                "  \"context\": {" +
+                "    \"workingDirectory\": \"" + workingDirectory + "\"," +
+                "    \"environmentVariables\": {" +
+                "      \"GO_PIPELINE_NAME\": \"my-test-pipeline\"," +
+                "      \"GO_SERVER_URL\": \"https://127.0.0.1:8154/go/\"," +
+                "      \"GO_STAGE_COUNTER\": \"1\"," +
+                "      \"GO_REVISION\": \"ec5432eecd183340bd79d526d2632fd60523638c\"," +
+                "      \"GO_FROM_REVISION\": \"ec5432eecd183340bd79d526d2632fd60523638c\"," +
+                "      \"GO_PIPELINE_COUNTER\": \"7\"," +
+                "      \"GO_PIPELINE_LABEL\": \"7\"," +
+                "      \"GO_JOB_NAME\": \"defaultJob\"," +
+                "      \"GO_TO_REVISION\": \"ec5432eecd183340bd79d526d2632fd60523638c\"," +
+                "      \"GO_STAGE_NAME\": \"defaultStage\"," +
+                "      \"GO_TRIGGER_USER\": \"anonymous\"" +
+                "    }" +
+                "  }," +
+                "  \"config\": {" +
+                "    \"resultXmlFileLocation\": {" +
+                "      \"secure\": false," +
+                "      \"value\": \"" + resultXmlFileLocation +"\"," +
                 "      \"required\": false" +
                 "    }" +
                 "  }" +

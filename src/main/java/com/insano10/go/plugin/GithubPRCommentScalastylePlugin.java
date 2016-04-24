@@ -53,7 +53,7 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
     public void initializeGoApplicationAccessor(GoApplicationAccessor goApplicationAccessor)
     {
     }
-    
+
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) throws UnhandledRequestTypeException
     {
@@ -125,30 +125,38 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
 
             Map configData = (Map) dataMap.get("config");
             Map contextData = (Map) dataMap.get("context");
+            Map envVarsData = (Map) contextData.get("environmentVariables");
             Map resultsFileData = (Map) configData.get("resultXmlFileLocation");
             String workingDirectory = (String) contextData.get("workingDirectory");
             String resultXmlFileLocation = (String) resultsFileData.get("value");
             String fullResultsXmlFileLocation = workingDirectory + "/" + resultXmlFileLocation;
 
-            final Path resultsFilePath = Paths.get(fullResultsXmlFileLocation);
 
-            if (Files.exists(resultsFilePath))
+            if (taskWasTriggeredFromPullRequest(envVarsData))
             {
-                final String summary = scalastyleResultsAnalyser.buildGithubMarkdownSummary(resultsFilePath);
+                final Path resultsFilePath = Paths.get(fullResultsXmlFileLocation);
+
+                if (Files.exists(resultsFilePath))
+                {
+                    final String summary = scalastyleResultsAnalyser.buildGithubMarkdownSummary(resultsFilePath);
 
 
-                Map envVarsData = (Map) contextData.get("environmentVariables");
+                    String url = (String) envVarsData.get(getKeyLike(envVarsData, "^GO_SCM.*PRS_URL$"));
+                    int pullRequestId = Integer.parseInt((String) envVarsData.get(getKeyLike(envVarsData, "^GO_SCM.*PRS_PR_ID$")));
 
-                String url = (String) envVarsData.get(getKeyLike(envVarsData, "^GO_SCM.*PRS_URL$"));
-                int pullRequestId = Integer.parseInt((String)envVarsData.get(getKeyLike(envVarsData, "^GO_SCM.*PRS_PR_ID$")));
+                    pullRequestCommenter.addCommentToPullRequest(url, pullRequestId, summary);
 
-                pullRequestCommenter.addCommentToPullRequest(url, pullRequestId, summary);
-
-                logger().printLine("Summary successfully added to " + url + ", PR ID [" + pullRequestId + "]");
+                    logger().printLine("Summary successfully added to " + url + ", PR ID [" + pullRequestId + "]");
+                }
+                else
+                {
+                    logger().printLine("No Scalastyle results found at " + resultsFilePath.toAbsolutePath());
+                }
             }
             else
             {
-                logger().printLine("No Scalastyle results found at " + resultsFilePath.toAbsolutePath());
+                logger().printLine("Task was not triggered from a pull request. Aborting.");
+                logger().printLine("This task is only compatible with the Github material (that builds pull requests) not the standard Git material");
             }
 
             logger().printLine("Task execution complete.");
@@ -161,11 +169,17 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
         }
     }
 
+    private boolean taskWasTriggeredFromPullRequest(final Map<String, Object> taskEnvironmentVariables)
+    {
+        //the GO_SCM keys are only present if the task was triggered from a PR
+        return getKeyLike(taskEnvironmentVariables, "^GO_SCM.*PRS_URL$") != null;
+    }
+
     private String getKeyLike(final Map<String, Object> map, final String regex)
     {
         for (String key : map.keySet())
         {
-            if(key.matches(regex))
+            if (key.matches(regex))
             {
                 return key;
             }
@@ -185,7 +199,7 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
     private JobConsoleLogger logger()
     {
         //horrible hack to lazily load the logger after a context magically appears from somewhere
-        if(this.consoleLogger == null)
+        if (this.consoleLogger == null)
         {
             this.consoleLogger = JobConsoleLogger.getConsoleLogger();
         }
