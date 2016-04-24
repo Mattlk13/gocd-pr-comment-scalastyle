@@ -38,7 +38,9 @@ This plugin will add scalastyle static analysis results to Github pull requests 
 ![Set Artifact Location][5]
 
 4) add a 'Github PR Comment: Scalastyle' task
+
 5) point the task to the location of the scalastyle results (this will tend to be target/scalastyle-result.xml)
+
 6) point the task to the folder containing the XML file artifact (this is needed for the trackback link) 
 
 ![Scalastyle Plugin Configuration][6]
