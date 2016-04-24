@@ -149,7 +149,6 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
 
             final String serverBaseURLToUse = System.getProperty("go.plugin.github.pr.comment.go-server", "http://localhost:8153");
 
-            //http://localhost:8153/go/files/scala-playground/27/defaultStage/2/compile/analysis/scalastyle-result.xml
             final String trackbackLink = String.format("%s/go/files/%s/%s/%s/%s/%s/%s",
                                                        serverBaseURLToUse, pipelineName, pipelineLabel, stageName, stageCounter, jobName, fullResultsArtifactLocation);
 
