@@ -1,4 +1,4 @@
-# gocd-scalastyle-notifier
+# gocd-pr-comment-scalastyle
 
 This plugin will add scalastyle static analysis results to Github pull requests built using a GoCD pipeline
 
@@ -27,6 +27,8 @@ Usage:
 
 1. create a pipeline with a Github material that will build a repository's pull requests
 2. add an 'sbt scalastyle' task to one of the stages
+3. add a 'Github PR Comment: Scalastyle' task afterwards
+4. point the task to the location of the scalastyle results (this will tend to be target/scalastyle-result.xml)
 
-When the pipeline completes successfully, the plugin will examine the scalastyle results XML file and comment on the pull request with a summary of the findings
+When the task executes, the plugin will examine the scalastyle results XML file and comment on the pull request with a summary of the findings
 
