@@ -17,7 +17,7 @@ This plugin will add scalastyle static analysis results to Github pull requests 
 
 ![Go Agent Properties][1]
 
-4. restart the go-server
+4. restart the go-server and go-agents
 5. ensure you have a .github file in the go user's home directory with your authentication details
 
 ![Github Properties][2]
