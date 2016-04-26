@@ -13,9 +13,9 @@ This plugin will add scalastyle static analysis results to Github pull requests 
 
 1. Either build the plugin with 'mvn clean install' or download the latest release
 2. copy the plugin jar file into the go-server plugins/external folder
-3. Set the go server base URL to use in the trackback link (in /etc/default/go-server)
+3. Set the go server base URL to use in the trackback link (in /etc/default/go-agent)
 
-![Go Server Properties][1]
+![Go Agent Properties][1]
 
 4. restart the go-server
 5. ensure you have a .github file in the go user's home directory with your authentication details
@@ -54,7 +54,7 @@ You can click on the 'details' link to view the raw XML results behind the summa
 ![Pull Request Comment][7]
 
 
-[1]: images/example_go_server_properties.png  "Go Server Properties"
+[1]: images/example_go_agent_properties.png  "Go Agent Properties"
 [2]: images/example_github_properties.png  "Github Properties"
 [3]: images/example_github_material_pipeline.png  "Github Material Pipeline"
 [4]: images/example_pipeline_tasks.png  "Pipeline Tasks"
