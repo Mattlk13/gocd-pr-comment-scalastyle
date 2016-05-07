@@ -1,11 +1,15 @@
 package com.insano10.go.plugin.fixtures;
 
+import com.google.common.base.Joiner;
 import com.insano10.go.plugin.PluginConstants;
 import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
 
+import java.util.List;
+
 public class ApiRequestFixtures
 {
-    public static DefaultGoPluginApiRequest executeTaskFromPRRequest(String repositoryUrl, int pullRequestId, final String workingDirectory, final String resultXmlFileLocation, String artifactXmlFileLocation)
+    public static DefaultGoPluginApiRequest executeTaskFromPRRequest(String repositoryUrl, int pullRequestId, final String workingDirectory,
+                                                                     final List<String> resultXmlFileLocations, final List<String> artifactXmlFileLocations)
     {
         final String requestBody = "{" +
                 "  \"context\": {" +
@@ -33,12 +37,12 @@ public class ApiRequestFixtures
                 "  \"config\": {" +
                 "    \"resultXmlFileLocation\": {" +
                 "      \"secure\": false," +
-                "      \"value\": \"" + resultXmlFileLocation + "\"," +
+                "      \"value\": \"" + Joiner.on(", ").join(resultXmlFileLocations) + "\"," +
                 "      \"required\": false" +
                 "    }," +
                 "    \"artifactXmlFileLocation\": {" +
                 "      \"secure\": false," +
-                "      \"value\": \"" + artifactXmlFileLocation + "\"," +
+                "      \"value\": \"" + Joiner.on(", ").join(artifactXmlFileLocations) + "\"," +
                 "      \"required\": false" +
                 "    }" +
                 "  }" +
@@ -47,7 +51,7 @@ public class ApiRequestFixtures
         return createRequest(requestBody);
     }
 
-    public static DefaultGoPluginApiRequest executeTaskFromMasterRequest(final String workingDirectory, final String resultXmlFileLocation, String artifactXmlFileLocation)
+    public static DefaultGoPluginApiRequest executeTaskFromMasterRequest(final String workingDirectory, final List<String> resultXmlFileLocations, final List<String> artifactXmlFileLocations)
     {
         final String requestBody = "{" +
                 "  \"context\": {" +
@@ -69,12 +73,12 @@ public class ApiRequestFixtures
                 "  \"config\": {" +
                 "    \"resultXmlFileLocation\": {" +
                 "      \"secure\": false," +
-                "      \"value\": \"" + resultXmlFileLocation +"\"," +
+                "      \"value\": \"" + Joiner.on(", ").join(resultXmlFileLocations) +"\"," +
                 "      \"required\": false" +
                 "    }," +
                 "    \"artifactXmlFileLocation\": {" +
                 "      \"secure\": false," +
-                "      \"value\": \"" + artifactXmlFileLocation + "\"," +
+                "      \"value\": \"" + Joiner.on(", ").join(artifactXmlFileLocations) + "\"," +
                 "      \"required\": false" +
                 "    }" +
                 "  }" +

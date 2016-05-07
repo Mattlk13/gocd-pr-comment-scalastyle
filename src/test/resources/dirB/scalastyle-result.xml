@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="5.0">
+ <file name="/home/jenny/code/scala/scala-playground/src/main/scala/insano10/coursera/assignments/week07/streams/StringParserTerrain.scala">
+  <error line="1" source="org.scalastyle.file.HeaderMatchesChecker" severity="warning" message="Header does not match expected text"/>
+  <error column="4" line="56" source="org.scalastyle.scalariform.IfBraceChecker" severity="warning" message="If block needs braces"/>
+  <error column="9" line="57" source="org.scalastyle.scalariform.IfBraceChecker" severity="warning" message="If block needs braces"/>
+ </file>
+ <file name="/home/jenny/code/scala/scala-playground/src/main/scala/insano10/coursera/apps/HelloScala.scala">
+  <error line="1" source="org.scalastyle.file.HeaderMatchesChecker" severity="warning" message="Header does not match expected text"/>
+  <error column="34" line="6" source="org.scalastyle.file.RegexChecker" severity="warning" message="Regular expression matched 'println'"/>
+  <error column="6" line="6" source="org.scalastyle.scalariform.PublicMethodsHaveTypeChecker" severity="warning" message="Public method must have explicit type"/>
+ </file>
+ <file name="/home/jenny/code/scala/scala-playground/src/main/scala/insano10/coursera/assignments/week03/package.scala">
+  <error line="1" source="org.scalastyle.file.HeaderMatchesChecker" severity="warning" message="Header does not match expected text"/>
+  <error column="0" line="15" source="org.scalastyle.file.WhitespaceEndOfLineChecker" severity="warning" message="Whitespace at end of line"/>
+  <error column="4" line="18" source="org.scalastyle.file.WhitespaceEndOfLineChecker" severity="warning" message="Whitespace at end of line"/>
+  <error column="4" line="20" source="org.scalastyle.file.WhitespaceEndOfLineChecker" severity="warning" message="Whitespace at end of line"/>
+  <error column="4" line="35" source="org.scalastyle.scalariform.IfBraceChecker" severity="warning" message="If block needs braces"/>
+  <error column="6" line="23" source="org.scalastyle.scalariform.PublicMethodsHaveTypeChecker" severity="warning" message="Public method must have explicit type"/>
+ </file>
+ <file name="/home/jenny/code/scala/scala-playground/src/main/scala/insano10/random/futures/SequentialFutureResults.scala">
+  <error line="1" source="org.scalastyle.file.HeaderMatchesChecker" severity="warning" message="Header does not match expected text"/>
+  <error column="37" line="28" source="org.scalastyle.scalariform.MagicNumberChecker" severity="warning" message="Magic Number"/>
+  <error column="32" line="23" source="org.scalastyle.file.RegexChecker" severity="warning" message="Regular expression matched 'println'"/>
+  <error column="36" line="25" source="org.scalastyle.file.RegexChecker" severity="warning" message="Regular expression matched 'println'"/>
+  <error column="4" line="28" source="org.scalastyle.file.RegexChecker" severity="warning" message="Regular expression matched 'println'"/>
+ </file>
+ <file name="/home/jenny/code/scala/scala-playground/src/main/scala/insano10/ninetyninescalaproblems/One.scala">
+  <error line="1" source="org.scalastyle.file.HeaderMatchesChecker" severity="warning" message="Header does not match expected text"/>
+ </file>
+ <file name="/home/jenny/code/scala/scala-playground/src/main/scala/insano10/random/futures/FutureCallbacks.scala">
+  <error line="1" source="org.scalastyle.file.HeaderMatchesChecker" severity="warning" message="Header does not match expected text"/>
+  <error column="43" line="48" source="org.scalastyle.scalariform.MagicNumberChecker" severity="warning" message="Magic Number"/>
+  <error column="45" line="49" source="org.scalastyle.scalariform.MagicNumberChecker" severity="warning" message="Magic Number"/>
+  <error column="27" line="21" source="org.scalastyle.file.RegexChecker" severity="warning" message="Regular expression matched 'println'"/>
+  <error column="25" line="22" source="org.scalastyle.file.RegexChecker" severity="warning" message="Regular expression matched 'println'"/>
+  <error column="16" line="35" source="org.scalastyle.file.RegexChecker" severity="warning" message="Regular expression matched 'println'"/>
+ </file>
+ <file name="/home/jenny/code/scala/scala-playground/src/main/scala/insano10/random/externalprocesses/DevCtl.scala">
+  <error line="1" source="org.scalastyle.file.HeaderMatchesChecker" severity="warning" message="Header does not match expected text"/>
+  <error column="6" line="92" source="org.scalastyle.scalariform.PublicMethodsHaveTypeChecker" severity="warning" message="Public method must have explicit type"/>
+ </file>
+ <file name="/home/jenny/code/scala/scala-playground/src/main/scala/insano10/random/apiresponses/APIResponse.scala">
+  <error line="1" source="org.scalastyle.file.HeaderMatchesChecker" severity="warning" message="Header does not match expected text"/>
+ </file>
+</checkstyle>

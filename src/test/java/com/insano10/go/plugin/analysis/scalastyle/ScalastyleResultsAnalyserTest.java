@@ -10,7 +10,7 @@ import static org.junit.Assert.assertThat;
 
 public class ScalastyleResultsAnalyserTest
 {
-    private static final Path RESULTS_FILE_PATH = Paths.get("src/test/resources/scalastyle-result.xml");
+    private static final Path RESULTS_FILE_PATH = Paths.get("src/test/resources/dirA/scalastyle-result.xml");
     private static final String TRACKBACK_LINK = "http://go/here";
 
     private final ScalastyleResultsAnalyser analyser = new ScalastyleResultsAnalyser();

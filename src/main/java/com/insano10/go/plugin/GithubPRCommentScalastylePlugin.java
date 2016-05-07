@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.insano10.go.plugin.analysis.scalastyle.ScalastyleResultsAnalyser;
 import com.insano10.go.plugin.comment.GitHubPullRequestCommenter;
 import com.insano10.go.plugin.settings.PluginSettingsProvider;
+import com.insano10.go.plugin.utils.Utils;
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
 import com.thoughtworks.go.plugin.api.GoPlugin;
 import com.thoughtworks.go.plugin.api.GoPluginIdentifier;
@@ -81,17 +82,17 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
     private GoPluginApiResponse handleGetConfigRequest()
     {
         return DefaultGoPluginApiResponse.success("{" +
-                                                      "  \"resultXmlFileLocation\": {" +
-                                                      "    \"default-value\": \"target/scalastyle-result.xml\"," +
-                                                      "    \"secure\": false," +
-                                                      "    \"required\": true" +
-                                                      "  }," +
-                                                      "  \"artifactXmlFileLocation\": {" +
-                                                      "    \"default-value\": \"\"," +
-                                                      "    \"secure\": false," +
-                                                      "    \"required\": true" +
-                                                      "  }" +
-                                                      "}");
+                                                          "  \"resultXmlFileLocation\": {" +
+                                                          "    \"default-value\": \"target/scalastyle-result.xml\"," +
+                                                          "    \"secure\": false," +
+                                                          "    \"required\": true" +
+                                                          "  }," +
+                                                          "  \"artifactXmlFileLocation\": {" +
+                                                          "    \"default-value\": \"\"," +
+                                                          "    \"secure\": false," +
+                                                          "    \"required\": true" +
+                                                          "  }" +
+                                                          "}");
     }
 
     private GoPluginApiResponse handleTaskView()
@@ -132,14 +133,8 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
             final Map contextData = (Map) dataMap.get("context");
             final Map envVarsData = (Map) contextData.get("environmentVariables");
 
-            final Map resultsFileData = (Map) configData.get("resultXmlFileLocation");
-            final String workingDirectory = (String) contextData.get("workingDirectory");
-            final String resultXmlFileLocation = (String) resultsFileData.get("value");
-            final String fullResultsXmlFileLocation = workingDirectory + "/" + resultXmlFileLocation;
-
-            final Map resultsArtifactData = (Map) configData.get("artifactXmlFileLocation");
-            final String resultArtifactFileLocation = (String) resultsArtifactData.get("value");
-            final String fullResultsArtifactLocation = resultArtifactFileLocation + "/" + getResultsFileName(resultXmlFileLocation);
+            final String[] fullResultsXmlFileLocations = getResultFileLocations(configData, contextData);
+            final String[] fullResultsArtifactLocations = getArtifactFileLocations(configData, fullResultsXmlFileLocations);
 
             final String pipelineName = (String) envVarsData.get("GO_PIPELINE_NAME");
             final String pipelineLabel = (String) envVarsData.get("GO_PIPELINE_LABEL");
@@ -149,28 +144,27 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
 
             final String serverBaseURLToUse = System.getProperty("go.plugin.github.pr.comment.go-server", "http://localhost:8153");
 
-            final String trackbackLink = String.format("%s/go/files/%s/%s/%s/%s/%s/%s",
-                                                       serverBaseURLToUse, pipelineName, pipelineLabel, stageName, stageCounter, jobName, fullResultsArtifactLocation);
-
             if (taskWasTriggeredFromPullRequest(envVarsData))
             {
-                final Path resultsFilePath = Paths.get(fullResultsXmlFileLocation);
-
-                if (Files.exists(resultsFilePath))
+                final StringBuilder combinedSummary = new StringBuilder();
+                for (int i = 0; i < fullResultsXmlFileLocations.length; i++)
                 {
-                    final String summary = scalastyleResultsAnalyser.buildGithubMarkdownSummary(resultsFilePath, trackbackLink);
+                    combinedSummary.append(getResultFileSummary(fullResultsXmlFileLocations[i], fullResultsArtifactLocations[i], pipelineName, pipelineLabel, stageName, stageCounter, jobName, serverBaseURLToUse));
 
+                    if(i < fullResultsXmlFileLocations.length-1)
+                    {
+                        combinedSummary.append("\n\n");
+                    }
+                }
 
-                    final String url = (String) envVarsData.get(getKeyLike(envVarsData, "^GO_SCM.*PRS_URL$"));
-                    final int pullRequestId = Integer.parseInt((String) envVarsData.get(getKeyLike(envVarsData, "^GO_SCM.*PRS_PR_ID$")));
+                if(combinedSummary.length() > 0)
+                {
+                    final String url = (String) envVarsData.get(Utils.getKeyLike(envVarsData, "^GO_SCM.*PRS_URL$"));
+                    final int pullRequestId = Integer.parseInt((String) envVarsData.get(Utils.getKeyLike(envVarsData, "^GO_SCM.*PRS_PR_ID$")));
 
-                    pullRequestCommenter.addCommentToPullRequest(url, pullRequestId, summary);
+                    pullRequestCommenter.addCommentToPullRequest(url, pullRequestId, combinedSummary.toString());
 
                     logger().printLine("Summary successfully added to " + url + ", PR ID [" + pullRequestId + "]");
-                }
-                else
-                {
-                    logger().printLine("No Scalastyle results found at " + resultsFilePath.toAbsolutePath());
                 }
             }
             else
@@ -189,6 +183,50 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
         }
     }
 
+    private String getResultFileSummary(String resultsFile, String artifactFile, String pipelineName, String pipelineLabel, String stageName, String stageCounter, String jobName, String serverBaseURLToUse)
+    {
+        final Path resultsFilePath = Paths.get(resultsFile);
+
+        if (Files.exists(resultsFilePath))
+        {
+            final String trackbackLink = String.format("%s/go/files/%s/%s/%s/%s/%s/%s",
+                                                       serverBaseURLToUse, pipelineName, pipelineLabel, stageName, stageCounter, jobName, artifactFile);
+            return scalastyleResultsAnalyser.buildGithubMarkdownSummary(resultsFilePath, trackbackLink);
+        }
+        else
+        {
+            logger().printLine("No Scalastyle results found at " + resultsFilePath.toAbsolutePath());
+            return "";
+        }
+    }
+
+    private String[] getArtifactFileLocations(Map configData, String[] resultXmlFileLocations)
+    {
+        final Map resultsArtifactData = (Map) configData.get("artifactXmlFileLocation");
+        final String[] resultArtifactFileLocations = ((String) resultsArtifactData.get("value")).split(",");
+        final String[] fullResultsArtifactLocations = new String[resultArtifactFileLocations.length];
+
+        for (int i = 0; i < resultArtifactFileLocations.length; i++)
+        {
+            fullResultsArtifactLocations[i] = resultArtifactFileLocations[i].trim() + "/" + getResultsFileName(resultXmlFileLocations[i]);
+        }
+        return fullResultsArtifactLocations;
+    }
+
+    private String[] getResultFileLocations(Map configData, Map contextData)
+    {
+        final Map resultsFileData = (Map) configData.get("resultXmlFileLocation");
+        final String workingDirectory = (String) contextData.get("workingDirectory");
+        final String[] resultXmlFileLocations = ((String) resultsFileData.get("value")).split(",");
+        final String[] fullResultsXmlFileLocations = new String[resultXmlFileLocations.length];
+
+        for (int i = 0; i < resultXmlFileLocations.length; i++)
+        {
+            fullResultsXmlFileLocations[i] = workingDirectory + "/" + resultXmlFileLocations[i].trim();
+        }
+        return fullResultsXmlFileLocations;
+    }
+
     private String getResultsFileName(final String resultsXmlFileLocation)
     {
         final String[] tokens = resultsXmlFileLocation.split("/");
@@ -198,19 +236,7 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
     private boolean taskWasTriggeredFromPullRequest(final Map<String, Object> taskEnvironmentVariables)
     {
         //the GO_SCM keys are only present if the task was triggered from a PR
-        return getKeyLike(taskEnvironmentVariables, "^GO_SCM.*PRS_URL$") != null;
-    }
-
-    private String getKeyLike(final Map<String, Object> map, final String regex)
-    {
-        for (String key : map.keySet())
-        {
-            if (key.matches(regex))
-            {
-                return key;
-            }
-        }
-        return null;
+        return Utils.getKeyLike(taskEnvironmentVariables, "^GO_SCM.*PRS_URL$") != null;
     }
 
     private GoPluginApiResponse renderJSON(final int responseCode, Map response)
