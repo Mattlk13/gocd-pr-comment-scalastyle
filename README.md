@@ -33,23 +33,25 @@ This plugin will add scalastyle static analysis results to Github pull requests 
 
 ![Add Pipeline Tasks][4]
 
-3) save the scalastyle-result.xml file as a pipeline artifact
+3) save all scalastyle-result.xml files as a pipeline artifacts. You will only have 1 unless you have a multi-project sbt build
 
 ![Set Artifact Location][5]
 
 4) add a 'Github PR Comment: Scalastyle' task
 
-5) point the task to the location of the scalastyle results (this will tend to be target/scalastyle-result.xml)
+5) point the task to the locations of the scalastyle results. If you have a single project build this will tend to be target/scalastyle-result.xml. Otherwise provide a comma
+separated list of locations. (e.g. server/target/scalastyle-result.xml, client/target/scalastyle-result.xml)
 
-6) point the task to the folder containing the XML file artifact (this is needed for the trackback link) 
+6) point the task to the folders containing the XML file artifacts (this is needed for the trackback link). For each result file you specified in step 5, specify the matching
+artifact location as a comma separated list.
 
 ![Scalastyle Plugin Configuration][6]
 
 
 ## Output:
 
-When the task executes, the plugin will examine the scalastyle results XML file and comment on the pull request with a summary of the findings. 
-You can click on the 'details' link to view the raw XML results behind the summary.
+When the task executes, the plugin will examine the scalastyle results XML files and comment on the pull request if it found any errors, warning or infos.<br/>
+You can click on the artifact link to view the raw XML results behind the file summary.
 
 ![Pull Request Comment][7]
 
