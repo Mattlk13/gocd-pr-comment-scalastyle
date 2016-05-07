@@ -1,16 +1,16 @@
 <div class="form_item_block">
-  <label>Result XML File Location:<span class="asterisk">*</span>
+  <label>Result XML File Locations:<span class="asterisk">*</span>
   </label>
-  <input type="text" ng-model="resultXmlFileLocation" ng-required="true">
+  <input type="text" ng-model="resultXmlFileLocations" ng-required="true">
   </input>
-  <p>This is the relative location of the file output from running scalastyle. e.g. target/scalastyle-result.xml</p>
-  <span class="form_error" ng-show="GOINPUTNAME[Url].$error.server">{{ GOINPUTNAME[Url].$error.server }}</span>
+  <p>Comma separated list of the relative locations of the files output from running scalastyle. e.g. server/target/scalastyle-result.xml, client/target/scalastyle-result.xml</p>
+  <span class="form_error" ng-show="GOINPUTNAME[resultXmlFileLocations].$error.server">{{ GOINPUTNAME[resultXmlFileLocations].$error.server }}</span>
 </div>
 <div class="form_item_block">
-  <label>Artifact XML File Location:<span class="asterisk">*</span>
+  <label>Artifact XML File Locations:<span class="asterisk">*</span>
   </label>
-  <input type="text" ng-model="artifactXmlFileLocation" ng-required="true">
+  <input type="text" ng-model="artifactXmlFileLocations" ng-required="false">
   </input>
-  <p>This is the relative location of the results XML artifact e.g. analysis</p>
-  <span class="form_error" ng-show="GOINPUTNAME[Url].$error.server">{{ GOINPUTNAME[Url].$error.server }}</span>
+  <p>Comma separated list of the relative locations of the results XML artifacts e.g. analysis/server, analysis/client</p>
+  <span class="form_error" ng-show="GOINPUTNAME[artifactXmlFileLocations].$error.server">{{ GOINPUTNAME[artifactXmlFileLocations].$error.server }}</span>
 </div>

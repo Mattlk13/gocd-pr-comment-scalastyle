@@ -35,12 +35,12 @@ public class ApiRequestFixtures
                 "    }" +
                 "  }," +
                 "  \"config\": {" +
-                "    \"resultXmlFileLocation\": {" +
+                "    \"resultXmlFileLocations\": {" +
                 "      \"secure\": false," +
                 "      \"value\": \"" + Joiner.on(", ").join(resultXmlFileLocations) + "\"," +
                 "      \"required\": false" +
                 "    }," +
-                "    \"artifactXmlFileLocation\": {" +
+                "    \"artifactXmlFileLocations\": {" +
                 "      \"secure\": false," +
                 "      \"value\": \"" + Joiner.on(", ").join(artifactXmlFileLocations) + "\"," +
                 "      \"required\": false" +
@@ -48,7 +48,7 @@ public class ApiRequestFixtures
                 "  }" +
                 "}";
 
-        return createRequest(requestBody);
+        return createRequest(requestBody, PluginConstants.REQUEST_NAME_EXECUTE);
     }
 
     public static DefaultGoPluginApiRequest executeTaskFromMasterRequest(final String workingDirectory, final List<String> resultXmlFileLocations, final List<String> artifactXmlFileLocations)
@@ -71,12 +71,12 @@ public class ApiRequestFixtures
                 "    }" +
                 "  }," +
                 "  \"config\": {" +
-                "    \"resultXmlFileLocation\": {" +
+                "    \"resultXmlFileLocations\": {" +
                 "      \"secure\": false," +
                 "      \"value\": \"" + Joiner.on(", ").join(resultXmlFileLocations) +"\"," +
                 "      \"required\": false" +
                 "    }," +
-                "    \"artifactXmlFileLocation\": {" +
+                "    \"artifactXmlFileLocations\": {" +
                 "      \"secure\": false," +
                 "      \"value\": \"" + Joiner.on(", ").join(artifactXmlFileLocations) + "\"," +
                 "      \"required\": false" +
@@ -84,15 +84,33 @@ public class ApiRequestFixtures
                 "  }" +
                 "}";
 
-        return createRequest(requestBody);
+        return createRequest(requestBody, PluginConstants.REQUEST_NAME_EXECUTE);
+    }
+    
+    public static DefaultGoPluginApiRequest validateConfigRequest(final String resultsFileValue, final String artifactsLocationValue) {
+
+        final String requestBody = "{" +
+                "  \"resultXmlFileLocations\": {" +
+                "    \"secure\": false," +
+                "    \"value\": \"" + resultsFileValue + "\"," +
+                "    \"required\": true" +
+                "  }," +
+                "  \"artifactXmlFileLocations\": {" +
+                "    \"secure\": false," +
+                "    \"value\": \"" + artifactsLocationValue + "\"," +
+                "    \"required\": false" +
+                "  }" +
+                "}";
+
+        return createRequest(requestBody, PluginConstants.REQUEST_NAME_VALIDATE_CONFIGURATION);
     }
 
-    private static DefaultGoPluginApiRequest createRequest(String requestBody)
+    private static DefaultGoPluginApiRequest createRequest(String requestBody, final String requestName)
     {
         final DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest(
                 PluginConstants.TASK_PLUGIN_EXTENSION,
                 PluginConstants.TASK_PLUGIN_EXTENSION_VERSION,
-                PluginConstants.REQUEST_NAME_EXECUTE);
+                requestName);
         request.setRequestBody(requestBody);
         return request;
     }

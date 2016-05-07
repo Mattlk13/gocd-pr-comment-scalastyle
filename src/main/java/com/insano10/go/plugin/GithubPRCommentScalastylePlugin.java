@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.insano10.go.plugin.analysis.scalastyle.ScalastyleResultsAnalyser;
 import com.insano10.go.plugin.comment.GitHubPullRequestCommenter;
+import com.insano10.go.plugin.settings.ConfigurationValidator;
 import com.insano10.go.plugin.settings.PluginSettingsProvider;
 import com.insano10.go.plugin.utils.Utils;
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
@@ -82,15 +83,15 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
     private GoPluginApiResponse handleGetConfigRequest()
     {
         return DefaultGoPluginApiResponse.success("{" +
-                                                          "  \"resultXmlFileLocation\": {" +
+                                                          "  \"resultXmlFileLocations\": {" +
                                                           "    \"default-value\": \"target/scalastyle-result.xml\"," +
                                                           "    \"secure\": false," +
                                                           "    \"required\": true" +
                                                           "  }," +
-                                                          "  \"artifactXmlFileLocation\": {" +
+                                                          "  \"artifactXmlFileLocations\": {" +
                                                           "    \"default-value\": \"\"," +
                                                           "    \"secure\": false," +
-                                                          "    \"required\": true" +
+                                                          "    \"required\": false" +
                                                           "  }" +
                                                           "}");
     }
@@ -116,7 +117,7 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
 
     private GoPluginApiResponse validateConfiguration(final GoPluginApiRequest request)
     {
-        return DefaultGoPluginApiResponse.success("{\"errors\": {}}");
+        return ConfigurationValidator.validateConfiguration(request);
     }
 
     private GoPluginApiResponse executeTask(final GoPluginApiRequest request)
@@ -202,7 +203,7 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
 
     private String[] getArtifactFileLocations(Map configData, String[] resultXmlFileLocations)
     {
-        final Map resultsArtifactData = (Map) configData.get("artifactXmlFileLocation");
+        final Map resultsArtifactData = (Map) configData.get("artifactXmlFileLocations");
         final String[] resultArtifactFileLocations = ((String) resultsArtifactData.get("value")).split(",");
         final String[] fullResultsArtifactLocations = new String[resultArtifactFileLocations.length];
 
@@ -215,7 +216,7 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
 
     private String[] getResultFileLocations(Map configData, Map contextData)
     {
-        final Map resultsFileData = (Map) configData.get("resultXmlFileLocation");
+        final Map resultsFileData = (Map) configData.get("resultXmlFileLocations");
         final String workingDirectory = (String) contextData.get("workingDirectory");
         final String[] resultXmlFileLocations = ((String) resultsFileData.get("value")).split(",");
         final String[] fullResultsXmlFileLocations = new String[resultXmlFileLocations.length];
