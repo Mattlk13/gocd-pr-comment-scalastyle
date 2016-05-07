@@ -1,5 +1,7 @@
 package com.insano10.go.plugin.analysis.scalastyle;
 
+import com.thoughtworks.go.plugin.api.task.JobConsoleLogger;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -8,6 +10,17 @@ import java.util.List;
 
 public class ScalastyleResultsAnalyser
 {
+    private JobConsoleLogger consoleLogger;
+
+    public ScalastyleResultsAnalyser()
+    {
+    }
+
+    public ScalastyleResultsAnalyser(JobConsoleLogger logger)
+    {
+        this.consoleLogger = logger;
+    }
+
     public String buildGithubMarkdownSummary(String artifactFile, final Path resultsFilePath, String trackbackLink)
     {
         final List<String> lines = getLinesFromFile(resultsFilePath);
@@ -23,13 +36,21 @@ public class ScalastyleResultsAnalyser
             info += line.contains("severity=\"info\"") ? 1 : 0;
         }
 
-        return String.format("### :mag:  Scalastyle - [%s](%s)\n" +
-                              "\n" +
-                              "| Severity |  Issues found |\n" +
-                              "| -------- | ------------- |\n" +
-                              "| :exclamation:  **Errors**  | %d  |\n" +
-                              "| :warning:  **Warnings**  | %d |\n" +
-                              "| :information_source:  **Info**  | %d |", artifactFile, trackbackLink, errors, warnings, info);
+        if (errors + warnings + info == 0)
+        {
+            logger().printLine("Nothing to report. Move along!");
+            return "";
+        }
+        else
+        {
+            return String.format("### :mag:  Scalastyle - [%s](%s)\n" +
+                                         "\n" +
+                                         "| Severity |  Issues found |\n" +
+                                         "| -------- | ------------- |\n" +
+                                         "| :exclamation:  **Errors**  | %d  |\n" +
+                                         "| :warning:  **Warnings**  | %d |\n" +
+                                         "| :information_source:  **Info**  | %d |", artifactFile, trackbackLink, errors, warnings, info);
+        }
     }
 
     private List<String> getLinesFromFile(final Path filePath)
@@ -42,5 +63,15 @@ public class ScalastyleResultsAnalyser
         {
             throw new RuntimeException("Failed to read scalastyle results file", e);
         }
+    }
+
+    private JobConsoleLogger logger()
+    {
+        //horrible hack to lazily load the logger after a context magically appears from somewhere
+        if (this.consoleLogger == null)
+        {
+            this.consoleLogger = JobConsoleLogger.getConsoleLogger();
+        }
+        return this.consoleLogger;
     }
 }
