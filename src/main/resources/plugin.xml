@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<go-plugin id="github.pr.comment.scalastyle" version="1.2-SNAPSHOT">
+<go-plugin id="github.pr.comment.scalastyle" version="1.2">
     <about>
         <name>Github Pull Request Comment: Scalastyle</name>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2</version>
         <target-go-version>15.1.0</target-go-version>
         <description>Comments on Github pull requests with Scalastyle results</description>
         <vendor>
