@@ -12,6 +12,7 @@ public class ScalastyleResultsAnalyserTest
 {
     private static final Path RESULTS_FILE_PATH = Paths.get("src/test/resources/dirA/scalastyle-result.xml");
     private static final String TRACKBACK_LINK = "http://go/here";
+    private static final String ARTIFACT_FILE = "artifact/file.xml";
 
     private final ScalastyleResultsAnalyser analyser = new ScalastyleResultsAnalyser();
 
@@ -19,9 +20,9 @@ public class ScalastyleResultsAnalyserTest
     @Test
     public void shouldProduceMarkdownSummaryOfResults() throws Exception
     {
-        final String summary = analyser.buildGithubMarkdownSummary(RESULTS_FILE_PATH, TRACKBACK_LINK);
+        final String summary = analyser.buildGithubMarkdownSummary(ARTIFACT_FILE, RESULTS_FILE_PATH, TRACKBACK_LINK);
 
-        assertThat(summary, is("## :mag:  Scalastyle Summary  [(details)](" + TRACKBACK_LINK + ")\n" +
+        assertThat(summary, is("### :mag:  Scalastyle - [" + ARTIFACT_FILE + "](" + TRACKBACK_LINK + ")\n" +
                                        "\n" +
                                        "| Severity |  Issues found |\n" +
                                        "| -------- | ------------- |\n" +

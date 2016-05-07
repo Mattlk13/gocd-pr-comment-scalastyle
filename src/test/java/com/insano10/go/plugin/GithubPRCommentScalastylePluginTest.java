@@ -25,11 +25,13 @@ public class GithubPRCommentScalastylePluginTest
     private static final String RESULTS_FILE_1 = "resources/dirA/scalastyle-result.xml";
     private static final String RESULTS_FILE_2 = "resources/dirB/scalastyle-result.xml";
     private static final String UNKNOWN_RESULTS_FILE = "does/not/exist/scalastyle-result.xml";
-    private static final String ARTIFACT_FILE_1 = "analysis/dirA";
-    private static final String ARTIFACT_FILE_2 = "analysis/dirB";
+    private static final String ARTIFACT_DIR_1 = "analysis/dirA";
+    private static final String ARTIFACT_FILE_1 = "analysis/dirA/scalastyle-result.xml";
+    private static final String ARTIFACT_DIR_2 = "analysis/dirB";
+    private static final String ARTIFACT_FILE_2 = "analysis/dirB/scalastyle-result.xml";
 
     private static final List<String> RESULTS_FILE_LOCATIONS = newArrayList(RESULTS_FILE_1, RESULTS_FILE_2);
-    private static final List<String> ARTIFACT_FILE_LOCATIONS = newArrayList(ARTIFACT_FILE_1, ARTIFACT_FILE_2);
+    private static final List<String> ARTIFACT_FILE_LOCATIONS = newArrayList(ARTIFACT_DIR_1, ARTIFACT_DIR_2);
     private static final Path RESULTS_FILE_PATH_1 = Paths.get(WORKING_DIRECTORY + "/" + RESULTS_FILE_LOCATIONS.get(0));
     private static final Path RESULTS_FILE_PATH_2 = Paths.get(WORKING_DIRECTORY + "/" + RESULTS_FILE_LOCATIONS.get(1));
 
@@ -54,7 +56,7 @@ public class GithubPRCommentScalastylePluginTest
     public void shouldNotCommentIfScalastyleResultsAreNotFound() throws Exception
     {
         final GoPluginApiResponse response = plugin.handle(executeTaskFromPRRequest(REPOSITORY_URL, PULL_REQUEST_ID, WORKING_DIRECTORY,
-                                                                                    newArrayList(UNKNOWN_RESULTS_FILE), newArrayList(ARTIFACT_FILE_1)));
+                                                                                    newArrayList(UNKNOWN_RESULTS_FILE), newArrayList(ARTIFACT_DIR_1)));
 
         verify(pullRequestCommenter, never()).addCommentToPullRequest(any(String.class), anyInt(), any(String.class));
         assertEquals("{\"success\":true,\"message\":\"Task execution complete\"}", response.responseBody());
@@ -66,10 +68,10 @@ public class GithubPRCommentScalastylePluginTest
         final String expectedTrackbackLink = "http://localhost:8153/go/files/my-test-pipeline/19/defaultStage/1/myJob/analysis/dirA/scalastyle-result.xml";
         final String expectedComment = "hello world!";
 
-        when(scalastyleResultsAnalyser.buildGithubMarkdownSummary(RESULTS_FILE_PATH_1, expectedTrackbackLink)).thenReturn(expectedComment);
+        when(scalastyleResultsAnalyser.buildGithubMarkdownSummary(ARTIFACT_FILE_1, RESULTS_FILE_PATH_1, expectedTrackbackLink)).thenReturn(expectedComment);
 
         final GoPluginApiResponse response = plugin.handle(executeTaskFromPRRequest(REPOSITORY_URL, PULL_REQUEST_ID, WORKING_DIRECTORY,
-                                                                                    newArrayList(RESULTS_FILE_1), newArrayList(ARTIFACT_FILE_1)));
+                                                                                    newArrayList(RESULTS_FILE_1), newArrayList(ARTIFACT_DIR_1)));
 
         verify(pullRequestCommenter).addCommentToPullRequest(eq(REPOSITORY_URL), eq(PULL_REQUEST_ID), eq(expectedComment));
         assertEquals("{\"success\":true,\"message\":\"Task execution complete\"}", response.responseBody());
@@ -83,8 +85,8 @@ public class GithubPRCommentScalastylePluginTest
         final String expectedComment1 = "hello world!";
         final String expectedComment2 = "why hello, how are you!";
 
-        when(scalastyleResultsAnalyser.buildGithubMarkdownSummary(RESULTS_FILE_PATH_1, expectedTrackbackLink1)).thenReturn(expectedComment1);
-        when(scalastyleResultsAnalyser.buildGithubMarkdownSummary(RESULTS_FILE_PATH_2, expectedTrackbackLink2)).thenReturn(expectedComment2);
+        when(scalastyleResultsAnalyser.buildGithubMarkdownSummary(ARTIFACT_FILE_1, RESULTS_FILE_PATH_1, expectedTrackbackLink1)).thenReturn(expectedComment1);
+        when(scalastyleResultsAnalyser.buildGithubMarkdownSummary(ARTIFACT_FILE_2, RESULTS_FILE_PATH_2, expectedTrackbackLink2)).thenReturn(expectedComment2);
 
         final GoPluginApiResponse response = plugin.handle(executeTaskFromPRRequest(REPOSITORY_URL, PULL_REQUEST_ID, WORKING_DIRECTORY, RESULTS_FILE_LOCATIONS, ARTIFACT_FILE_LOCATIONS));
 

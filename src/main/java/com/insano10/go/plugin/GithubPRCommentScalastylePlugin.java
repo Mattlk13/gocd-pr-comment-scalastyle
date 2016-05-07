@@ -191,7 +191,7 @@ public class GithubPRCommentScalastylePlugin implements GoPlugin
         {
             final String trackbackLink = String.format("%s/go/files/%s/%s/%s/%s/%s/%s",
                                                        serverBaseURLToUse, pipelineName, pipelineLabel, stageName, stageCounter, jobName, artifactFile);
-            return scalastyleResultsAnalyser.buildGithubMarkdownSummary(resultsFilePath, trackbackLink);
+            return scalastyleResultsAnalyser.buildGithubMarkdownSummary(artifactFile, resultsFilePath, trackbackLink);
         }
         else
         {
